@@ -83,32 +83,38 @@
                 <div class="card">
                     <div class="card-icon">🗺️</div>
                     <h3 class="card-title" data-i18n="features.osm.title">OSM Parsing</h3>
-                    <p data-i18n="features.osm.desc">Parse OpenStreetMap data in both XML (.osm) and PBF formats to extract nodes and ways for routing.</p>
+                    <p data-i18n="features.osm.desc">Parse OpenStreetMap data in both XML (.osm) and PBF formats to
+                        extract nodes and ways for routing.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">📊</div>
                     <h3 class="card-title" data-i18n="features.graph.title">Graph Building</h3>
-                    <p data-i18n="features.graph.desc">Build a routable graph with haversine distance weights automatically calculated from coordinates.</p>
+                    <p data-i18n="features.graph.desc">Build a routable graph with haversine distance weights
+                        automatically calculated from coordinates.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">🧭</div>
                     <h3 class="card-title" data-i18n="features.dijkstra.title">Dijkstra Routing</h3>
-                    <p data-i18n="features.dijkstra.desc">Find shortest paths using Dijkstra's algorithm with efficient priority queue implementation.</p>
+                    <p data-i18n="features.dijkstra.desc">Find shortest paths using Dijkstra's algorithm with efficient
+                        priority queue implementation.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">⚡</div>
                     <h3 class="card-title" data-i18n="features.ch.title">Contraction Hierarchies</h3>
-                    <p data-i18n="features.ch.desc">Speed up queries with Contraction Hierarchies preprocessing for faster route computation.</p>
+                    <p data-i18n="features.ch.desc">Speed up queries with Contraction Hierarchies preprocessing for
+                        faster route computation.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">🌐</div>
                     <h3 class="card-title" data-i18n="features.api.title">REST API</h3>
-                    <p data-i18n="features.api.desc">Flask-based REST API compatible with OSRM-like endpoints for easy integration.</p>
+                    <p data-i18n="features.api.desc">Flask-based REST API compatible with OSRM-like endpoints for easy
+                        integration.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">🐍</div>
                     <h3 class="card-title" data-i18n="features.python.title">Pure Python</h3>
-                    <p data-i18n="features.python.desc">No complex dependencies, easy to install and extend. Works with Python 3.8+.</p>
+                    <p data-i18n="features.python.desc">No complex dependencies, easy to install and extend. Works with
+                        Python 3.8+.</p>
                 </div>
             </div>
         </div>
@@ -124,10 +130,12 @@
             </div>
 
             <div class="install-box">
-                <p style="margin-bottom: var(--space-lg); color: var(--text-secondary);" data-i18n="install.pypi">Install from PyPI:</p>
+                <p style="margin-bottom: var(--space-lg); color: var(--text-secondary);" data-i18n="install.pypi">
+                    Install from PyPI:</p>
                 <div class="install-command">
                     <span>pip install py-osrm-backend</span>
-                    <button onclick="copyToClipboard('pip install py-osrm-backend')" title="Copy to clipboard">📋</button>
+                    <button onclick="copyToClipboard('pip install py-osrm-backend')"
+                        title="Copy to clipboard">📋</button>
                 </div>
             </div>
 
@@ -135,9 +143,12 @@
                 <div class="card">
                     <h3 class="card-title" data-i18n="install.deps.title">📦 Dependencies</h3>
                     <p data-i18n="install.deps.desc">py-osrm-backend requires only two dependencies:</p>
-                    <ul style="color: var(--text-secondary); margin-top: var(--space-md); padding-left: var(--space-lg);">
-                        <li><code>flask</code> <span data-i18n="install.deps.flask">- For the REST API server</span></li>
-                        <li><code>osmium</code> <span data-i18n="install.deps.osmium">- For parsing PBF files</span></li>
+                    <ul
+                        style="color: var(--text-secondary); margin-top: var(--space-md); padding-left: var(--space-lg);">
+                        <li><code>flask</code> <span data-i18n="install.deps.flask">- For the REST API server</span>
+                        </li>
+                        <li><code>osmium</code> <span data-i18n="install.deps.osmium">- For parsing PBF files</span>
+                        </li>
                     </ul>
                 </div>
                 <div class="card">
@@ -193,17 +204,20 @@ distance, path = engine.<span class="function">shortest_path</span>(start_id, en
                 <div>
                     <div class="card" style="margin-bottom: var(--space-lg);">
                         <h3 class="card-title" data-i18n="quickstart.step1.title">1️⃣ Load OSM Data</h3>
-                        <p data-i18n="quickstart.step1.desc">Use <code>GraphBuilder</code> to parse OSM files and build a routable graph. Supports both .osm (XML) and .pbf formats.</p>
+                        <p data-i18n="quickstart.step1.desc">Use <code>GraphBuilder</code> to parse OSM files and build
+                            a routable graph. Supports both .osm (XML) and .pbf formats.</p>
                     </div>
 
                     <div class="card" style="margin-bottom: var(--space-lg);">
                         <h3 class="card-title" data-i18n="quickstart.step2.title">2️⃣ Create Engine</h3>
-                        <p data-i18n="quickstart.step2.desc">Initialize <code>DijkstraEngine</code> with your graph. For faster queries on large graphs, use <code>CHEngine</code> instead.</p>
+                        <p data-i18n="quickstart.step2.desc">Initialize <code>DijkstraEngine</code> with your graph. For
+                            faster queries on large graphs, use <code>CHEngine</code> instead.</p>
                     </div>
 
                     <div class="card">
                         <h3 class="card-title" data-i18n="quickstart.step3.title">3️⃣ Compute Routes</h3>
-                        <p data-i18n="quickstart.step3.desc">Call <code>shortest_path()</code> with start and end node IDs. Returns the total distance in kilometers and the path as a list of node IDs.</p>
+                        <p data-i18n="quickstart.step3.desc">Call <code>shortest_path()</code> with start and end node
+                            IDs. Returns the total distance in kilometers and the path as a list of node IDs.</p>
                     </div>
                 </div>
             </div>
@@ -262,15 +276,18 @@ distance, path = engine.<span class="function">shortest_path</span>(start_id, en
             <div class="grid-3" style="margin-top: var(--space-3xl);">
                 <div class="card">
                     <h3 class="card-title">📦 structures</h3>
-                    <p data-i18n="arch.structures">Core data structures including <code>Graph</code>, <code>Node</code>, and <code>Edge</code> classes.</p>
+                    <p data-i18n="arch.structures">Core data structures including <code>Graph</code>, <code>Node</code>,
+                        and <code>Edge</code> classes.</p>
                 </div>
                 <div class="card">
                     <h3 class="card-title">🔧 extractor</h3>
-                    <p data-i18n="arch.extractor.card">OSM parsing and graph building utilities. Handles XML and PBF formats.</p>
+                    <p data-i18n="arch.extractor.card">OSM parsing and graph building utilities. Handles XML and PBF
+                        formats.</p>
                 </div>
                 <div class="card">
                     <h3 class="card-title">🧭 engine</h3>
-                    <p data-i18n="arch.engine.card">Routing algorithms: Dijkstra and Contraction Hierarchies implementations.</p>
+                    <p data-i18n="arch.engine.card">Routing algorithms: Dijkstra and Contraction Hierarchies
+                        implementations.</p>
                 </div>
             </div>
         </div>
@@ -309,13 +326,15 @@ app.<span class="function">run</span>(host=<span class="string">"0.0.0.0"</span>
 
                 <div class="card">
                     <h3 class="card-title" data-i18n="api.route.title">📍 Route Endpoint</h3>
-                    <p style="margin-bottom: var(--space-md);" data-i18n="api.route.desc">Get a route between coordinates:</p>
+                    <p style="margin-bottom: var(--space-md);" data-i18n="api.route.desc">Get a route between
+                        coordinates:</p>
                     <div class="code-viewer">
                         <div class="code-content" style="padding: var(--space-md);">
                             <code>GET /route/v1/driving/{lon1},{lat1};{lon2},{lat2}</code>
                         </div>
                     </div>
-                    <p style="margin-top: var(--space-md); font-size: 0.9rem; color: var(--text-muted);" data-i18n="api.route.returns">
+                    <p style="margin-top: var(--space-md); font-size: 0.9rem; color: var(--text-muted);"
+                        data-i18n="api.route.returns">
                         Returns distance, duration, and geometry in GeoJSON format.
                     </p>
                 </div>
