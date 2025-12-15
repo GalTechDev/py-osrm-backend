@@ -5,7 +5,7 @@ A Python implementation of core OSRM (Open Source Routing Machine) functionality
 ## Installation
 
 ```bash
-pip install -e .
+pip install py-osrm-backend
 ```
 
 ## Features
