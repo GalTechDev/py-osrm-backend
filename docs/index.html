@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="py-osrm-backend - A Python implementation of OSRM backend core functionality for routing with OpenStreetMap data">
+    <title>py-osrm-backend | Python Routing Engine</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">py-osrm-backend</a>
+            <ul class="nav-links">
+                <li><a href="#features" data-i18n="nav.features">Features</a></li>
+                <li><a href="#installation" data-i18n="nav.installation">Installation</a></li>
+                <li><a href="#quickstart" data-i18n="nav.quickstart">Quick Start</a></li>
+                <li><a href="#architecture" data-i18n="nav.architecture">Architecture</a></li>
+                <li><a href="#api" data-i18n="nav.api">API</a></li>
+            </ul>
+            <!-- Language Switcher -->
+            <div class="lang-switcher">
+                <button class="lang-btn active" data-lang="en" onclick="switchLanguage('en')">EN</button>
+                <button class="lang-btn" data-lang="fr" onclick="switchLanguage('fr')">FR</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <span class="hero-badge" data-i18n="hero.badge">🗺️ Open Source Routing</span>
+            <h1>
+                <span class="gradient-text">py-osrm-backend</span>
+            </h1>
+            <p class="hero-subtitle" data-i18n="hero.subtitle">
+                A Python implementation of OSRM backend core functionality.
+                Build routing applications with OpenStreetMap data.
+            </p>
+
+            <div class="version-display">
+                <span class="version-value">v0.1.0</span>
+                <span class="version-label" data-i18n="hero.version">Latest Release</span>
+            </div>
+
+            <div class="hero-buttons">
+                <a href="#quickstart" class="btn btn-primary" data-i18n="hero.getstarted">
+                    🚀 Get Started
+                </a>
+                <a href="https://github.com/GalTechDev/py-osrm-backend" class="btn btn-secondary" target="_blank">
+                    ⭐ GitHub
+                </a>
+                <a href="https://pypi.org/project/py-osrm-backend/" class="btn btn-secondary" target="_blank">
+                    📦 PyPI
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge" data-i18n="features.badge">Capabilities</span>
+                <h2 data-i18n="features.title">Features</h2>
+                <p data-i18n="features.subtitle">Everything you need to build routing applications in Python</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">🗺️</div>
+                    <h3 class="card-title" data-i18n="features.osm.title">OSM Parsing</h3>
+                    <p data-i18n="features.osm.desc">Parse OpenStreetMap data in both XML (.osm) and PBF formats to extract nodes and ways for routing.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title" data-i18n="features.graph.title">Graph Building</h3>
+                    <p data-i18n="features.graph.desc">Build a routable graph with haversine distance weights automatically calculated from coordinates.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🧭</div>
+                    <h3 class="card-title" data-i18n="features.dijkstra.title">Dijkstra Routing</h3>
+                    <p data-i18n="features.dijkstra.desc">Find shortest paths using Dijkstra's algorithm with efficient priority queue implementation.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3 class="card-title" data-i18n="features.ch.title">Contraction Hierarchies</h3>
+                    <p data-i18n="features.ch.desc">Speed up queries with Contraction Hierarchies preprocessing for faster route computation.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🌐</div>
+                    <h3 class="card-title" data-i18n="features.api.title">REST API</h3>
+                    <p data-i18n="features.api.desc">Flask-based REST API compatible with OSRM-like endpoints for easy integration.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🐍</div>
+                    <h3 class="card-title" data-i18n="features.python.title">Pure Python</h3>
+                    <p data-i18n="features.python.desc">No complex dependencies, easy to install and extend. Works with Python 3.8+.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="architecture" id="installation">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge" data-i18n="install.badge">Setup</span>
+                <h2 data-i18n="install.title">Installation</h2>
+                <p data-i18n="install.subtitle">Get started in seconds with pip</p>
+            </div>
+
+            <div class="install-box">
+                <p style="margin-bottom: var(--space-lg); color: var(--text-secondary);" data-i18n="install.pypi">Install from PyPI:</p>
+                <div class="install-command">
+                    <span>pip install py-osrm-backend</span>
+                    <button onclick="copyToClipboard('pip install py-osrm-backend')" title="Copy to clipboard">📋</button>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: var(--space-xl);">
+                <div class="card">
+                    <h3 class="card-title" data-i18n="install.deps.title">📦 Dependencies</h3>
+                    <p data-i18n="install.deps.desc">py-osrm-backend requires only two dependencies:</p>
+                    <ul style="color: var(--text-secondary); margin-top: var(--space-md); padding-left: var(--space-lg);">
+                        <li><code>flask</code> <span data-i18n="install.deps.flask">- For the REST API server</span></li>
+                        <li><code>osmium</code> <span data-i18n="install.deps.osmium">- For parsing PBF files</span></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="card-title" data-i18n="install.dev.title">🔧 Development</h3>
+                    <p data-i18n="install.dev.desc">For development, install with extras:</p>
+                    <div class="code-viewer" style="margin-top: var(--space-md);">
+                        <div class="code-content" style="padding: var(--space-md);">
+                            <code>pip install py-osrm-backend[dev]</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section class="section" id="quickstart">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge" data-i18n="quickstart.badge">Tutorial</span>
+                <h2 data-i18n="quickstart.title">Quick Start</h2>
+                <p data-i18n="quickstart.subtitle">Build your first routing application in minutes</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="code-viewer">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">example.py</span>
+                    </div>
+                    <div class="code-content">
+                        <pre><code><span class="comment"># Import the library</span>
+<span class="keyword">from</span> osrm.extractor.graph_builder <span class="keyword">import</span> GraphBuilder
+<span class="keyword">from</span> osrm.engine.dijkstra <span class="keyword">import</span> DijkstraEngine
+
+<span class="comment"># Build graph from OSM file</span>
+builder = <span class="function">GraphBuilder</span>()
+graph = builder.<span class="function">build_graph</span>(<span class="string">"your_map.osm"</span>)
+
+<span class="comment"># Create routing engine</span>
+engine = <span class="function">DijkstraEngine</span>(graph)
+
+<span class="comment"># Find shortest path</span>
+distance, path = engine.<span class="function">shortest_path</span>(start_id, end_id)
+
+<span class="keyword">print</span>(<span class="string">f"Distance: {distance} km"</span>)
+<span class="keyword">print</span>(<span class="string">f"Path: {path}"</span>)</code></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card" style="margin-bottom: var(--space-lg);">
+                        <h3 class="card-title" data-i18n="quickstart.step1.title">1️⃣ Load OSM Data</h3>
+                        <p data-i18n="quickstart.step1.desc">Use <code>GraphBuilder</code> to parse OSM files and build a routable graph. Supports both .osm (XML) and .pbf formats.</p>
+                    </div>
+
+                    <div class="card" style="margin-bottom: var(--space-lg);">
+                        <h3 class="card-title" data-i18n="quickstart.step2.title">2️⃣ Create Engine</h3>
+                        <p data-i18n="quickstart.step2.desc">Initialize <code>DijkstraEngine</code> with your graph. For faster queries on large graphs, use <code>CHEngine</code> instead.</p>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title" data-i18n="quickstart.step3.title">3️⃣ Compute Routes</h3>
+                        <p data-i18n="quickstart.step3.desc">Call <code>shortest_path()</code> with start and end node IDs. Returns the total distance in kilometers and the path as a list of node IDs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="architecture" id="architecture">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge" data-i18n="arch.badge">Overview</span>
+                <h2 data-i18n="arch.title">Architecture</h2>
+                <p data-i18n="arch.subtitle">Modular design for flexibility and extensibility</p>
+            </div>
+
+            <div class="architecture-diagram">
+                <div class="arch-node">
+                    <div class="arch-node-icon">📁</div>
+                    <div class="arch-node-title" data-i18n="arch.osm.title">OSM Data</div>
+                    <div class="arch-node-desc" data-i18n="arch.osm.desc">.osm / .pbf files<br>OpenStreetMap</div>
+                </div>
+
+                <div class="arch-arrow">→</div>
+
+                <div class="arch-node">
+                    <div class="arch-node-icon">🔧</div>
+                    <div class="arch-node-title" data-i18n="arch.extractor.title">Extractor</div>
+                    <div class="arch-node-desc" data-i18n="arch.extractor.desc">Parse & Build<br>Graph Structure</div>
+                </div>
+
+                <div class="arch-arrow">→</div>
+
+                <div class="arch-node">
+                    <div class="arch-node-icon">📊</div>
+                    <div class="arch-node-title" data-i18n="arch.graph.title">Graph</div>
+                    <div class="arch-node-desc" data-i18n="arch.graph.desc">Nodes & Edges<br>Weighted Network</div>
+                </div>
+
+                <div class="arch-arrow">→</div>
+
+                <div class="arch-node">
+                    <div class="arch-node-icon">🧭</div>
+                    <div class="arch-node-title" data-i18n="arch.engine.title">Engine</div>
+                    <div class="arch-node-desc" data-i18n="arch.engine.desc">Dijkstra / CH<br>Route Computation</div>
+                </div>
+
+                <div class="arch-arrow">→</div>
+
+                <div class="arch-node">
+                    <div class="arch-node-icon">🌐</div>
+                    <div class="arch-node-title" data-i18n="arch.server.title">API Server</div>
+                    <div class="arch-node-desc" data-i18n="arch.server.desc">Flask REST<br>HTTP Endpoints</div>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: var(--space-3xl);">
+                <div class="card">
+                    <h3 class="card-title">📦 structures</h3>
+                    <p data-i18n="arch.structures">Core data structures including <code>Graph</code>, <code>Node</code>, and <code>Edge</code> classes.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">🔧 extractor</h3>
+                    <p data-i18n="arch.extractor.card">OSM parsing and graph building utilities. Handles XML and PBF formats.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">🧭 engine</h3>
+                    <p data-i18n="arch.engine.card">Routing algorithms: Dijkstra and Contraction Hierarchies implementations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section class="section" id="api">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge" data-i18n="api.badge">REST API</span>
+                <h2 data-i18n="api.title">HTTP Endpoints</h2>
+                <p data-i18n="api.subtitle">OSRM-compatible REST API for web applications</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="code-viewer">
+                    <div class="code-header">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                        <span class="code-title">run_server.py</span>
+                    </div>
+                    <div class="code-content">
+                        <pre><code><span class="keyword">from</span> osrm.server.app <span class="keyword">import</span> create_app
+<span class="keyword">from</span> osrm.extractor.graph_builder <span class="keyword">import</span> GraphBuilder
+
+<span class="comment"># Build graph</span>
+builder = <span class="function">GraphBuilder</span>()
+graph = builder.<span class="function">build_graph</span>(<span class="string">"map.osm"</span>)
+
+<span class="comment"># Create and run server</span>
+app = <span class="function">create_app</span>(graph)
+app.<span class="function">run</span>(host=<span class="string">"0.0.0.0"</span>, port=<span class="number">5000</span>)</code></pre>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title" data-i18n="api.route.title">📍 Route Endpoint</h3>
+                    <p style="margin-bottom: var(--space-md);" data-i18n="api.route.desc">Get a route between coordinates:</p>
+                    <div class="code-viewer">
+                        <div class="code-content" style="padding: var(--space-md);">
+                            <code>GET /route/v1/driving/{lon1},{lat1};{lon2},{lat2}</code>
+                        </div>
+                    </div>
+                    <p style="margin-top: var(--space-md); font-size: 0.9rem; color: var(--text-muted);" data-i18n="api.route.returns">
+                        Returns distance, duration, and geometry in GeoJSON format.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text" data-i18n="footer.text">
+                py-osrm-backend — Open Source Routing Engine by GalTechDev
+            </p>
+            <div class="footer-links">
+                <a href="https://github.com/GalTechDev/py-osrm-backend" target="_blank">GitHub</a>
+                <a href="https://pypi.org/project/py-osrm-backend/" target="_blank">PyPI</a>
+                <a href="https://github.com/GalTechDev/py-osrm-backend/issues" target="_blank">Issues</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/i18n.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

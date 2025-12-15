@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.env
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OSM Data files
+*.osm
+*.pbf
+*.osm.bz2
+*.osm.gz
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

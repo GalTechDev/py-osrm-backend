@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  py-osrm-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: py-osrm-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount your OSM file here
+      - ./data:/app/data:ro
+    environment:
+      # Path to OSM file inside container
+      - OSM_FILE=/app/data/map.osm
+      # Flask environment
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Development service with auto-reload
+  py-osrm-backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: py-osrm-backend-dev
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./data:/app/data:ro
+      - ./src:/app/src:ro
+    environment:
+      - OSM_FILE=/app/data/map.osm
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    profiles:
+      - dev
