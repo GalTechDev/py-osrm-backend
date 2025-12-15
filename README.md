@@ -1,5 +1,12 @@
 # py-osrm-backend
 
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://img.shields.io/pypi/v/py-osrm-backend.svg)](https://pypi.org/project/py-osrm-backend/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Flask](https://img.shields.io/badge/Flask-API-green.svg)](https://flask.palletsprojects.com/)
+[![OpenStreetMap](https://img.shields.io/badge/OSM-Compatible-brightgreen.svg)](https://www.openstreetmap.org/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://galtechdev.github.io/py-osrm-backend/)
+
 A Python implementation of core OSRM (Open Source Routing Machine) functionality.
 
 ## Installation
