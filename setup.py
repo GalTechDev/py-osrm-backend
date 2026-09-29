@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="py-osrm-backend",
-    version="0.1.0",
+    version="0.1.1",
     description="A Python implementation of OSRM backend core functionality",
     long_description=long_description,
     long_description_content_type="text/markdown",

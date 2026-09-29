@@ -24,6 +24,7 @@ env/
 
 # OSM Data files
 *.osm
+!tests/sample.osm
 *.pbf
 *.osm.bz2
 *.osm.gz

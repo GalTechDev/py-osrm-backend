@@ -41,10 +41,15 @@ COPY src/ ./src/
 # Expose the API port
 EXPOSE 5000
 
-# Health check
+# Server configuration (see osrm.server.api)
+ENV OSRM_FILE=/app/data/map.osm \
+    OSRM_HOST=0.0.0.0 \
+    OSRM_PORT=5000
+
+# Health check (the slim image has no curl)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')" || exit 1
 
 # Default command: run the API server
 # Users should mount their OSM file to /app/data/map.osm
-CMD ["python", "-c", "from osrm.server.app import create_app; from osrm.extractor.graph_builder import GraphBuilder; import os; osm_file = os.environ.get('OSM_FILE', '/app/data/map.osm'); builder = GraphBuilder(); graph = builder.build_graph(osm_file); app = create_app(graph); app.run(host='0.0.0.0', port=5000)"]
+CMD ["python", "-m", "osrm.server.api"]

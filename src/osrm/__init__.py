@@ -4,7 +4,7 @@ py-osrm-backend: A Python implementation of OSRM backend core functionality.
 This package provides routing capabilities using OpenStreetMap data.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "GalTechDev"
 
 # Public API

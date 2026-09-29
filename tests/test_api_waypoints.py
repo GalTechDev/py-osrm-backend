@@ -60,7 +60,7 @@ class TestAPIWaypoints(unittest.TestCase):
         
         data = json.loads(resp.data)
         self.assertEqual(data['code'], 'Ok')
-        self.assertEqual(data['routes'][0]['distance'], 10.0)
+        self.assertEqual(data['routes'][0]['distance'], 10000.0)
 
     def test_three_waypoints(self):
         # Route 1->2->3
@@ -69,7 +69,7 @@ class TestAPIWaypoints(unittest.TestCase):
         
         data = json.loads(resp.data)
         self.assertEqual(data['code'], 'Ok')
-        self.assertEqual(data['routes'][0]['distance'], 20.0)
+        self.assertEqual(data['routes'][0]['distance'], 20000.0)
         
         # Check geometry stitching
         # Path 1->2 is [1, 2]

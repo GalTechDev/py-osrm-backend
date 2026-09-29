@@ -26,6 +26,11 @@ class Shortcut:
     weight: float
     via: int  # The contracted node this shortcut bypasses
 
+@dataclass
+class ShortcutEdge(Edge):
+    """Graph edge standing for a shortcut, so query paths can be unpacked."""
+    via: int = -1
+
 class ContractionHierarchies:
     """
     Contraction Hierarchies for fast shortest path queries.
@@ -36,20 +41,35 @@ class ContractionHierarchies:
         distance, path = ch.query(start, end)
     """
     
+    # Max nodes settled by a witness search before giving up and adding the shortcut
+    WITNESS_SEARCH_LIMIT = 500
+    
     def __init__(self, graph: Graph):
         self.original_graph = graph
         self.ch_nodes: Dict[int, CHNode] = {}
+        # Private copy of the edges (original + shortcuts): the input graph is never modified
+        self.out_edges: Dict[int, List[Edge]] = {}
+        self.in_edges: Dict[int, List[Edge]] = {}
         self.upward_edges: Dict[int, List[Edge]] = {}  # Edges to higher-level nodes
         self.downward_edges: Dict[int, List[Edge]] = {}  # Edges to lower-level nodes
+        # Reverse upward edges: for v, edges u -> v where u is higher than v (backward search)
+        self.backward_upward_edges: Dict[int, List[Edge]] = {}
         self.shortcuts: List[Shortcut] = []
         self._initialize()
     
     def _initialize(self):
-        """Initialize CH nodes from original graph."""
+        """Initialize CH nodes and edge copies from the original graph."""
         for node_id in self.original_graph.nodes:
             self.ch_nodes[node_id] = CHNode(id=node_id)
+            self.out_edges[node_id] = []
+            self.in_edges[node_id] = []
             self.upward_edges[node_id] = []
             self.downward_edges[node_id] = []
+            self.backward_upward_edges[node_id] = []
+        for edges in self.original_graph.adj_list.values():
+            for edge in edges:
+                self.out_edges[edge.source].append(edge)
+                self.in_edges[edge.target].append(edge)
     
     def _compute_node_importance(self, node_id: int, contracted: Set[int]) -> int:
         """
@@ -58,25 +78,22 @@ class ContractionHierarchies:
         
         Simplified heuristic: edge difference + contracted neighbors
         """
-        # Count edges to non-contracted neighbors
+        # Count edges to/from non-contracted neighbors
         in_edges = 0
         out_edges = 0
-        neighbors_in = []
-        neighbors_out = []
+        contracted_neighbors = 0
         
-        for edge in self.original_graph.get_edges(node_id):
-            if edge.target not in contracted:
+        for edge in self.out_edges[node_id]:
+            if edge.target in contracted:
+                contracted_neighbors += 1
+            else:
                 out_edges += 1
-                neighbors_out.append(edge.target)
         
-        # Count incoming edges (check all nodes)
-        for other_id, edges in self.original_graph.adj_list.items():
-            if other_id in contracted:
-                continue
-            for edge in edges:
-                if edge.target == node_id:
-                    in_edges += 1
-                    neighbors_in.append(other_id)
+        for edge in self.in_edges[node_id]:
+            if edge.source in contracted:
+                contracted_neighbors += 1
+            else:
+                in_edges += 1
         
         # Shortcuts needed = in_edges * out_edges (worst case)
         shortcuts_needed = in_edges * out_edges
@@ -84,9 +101,7 @@ class ContractionHierarchies:
         # Edge difference = shortcuts added - edges removed
         edge_diff = shortcuts_needed - (in_edges + out_edges)
         
-        # Contracted neighbors penalty
-        contracted_neighbors = sum(1 for n in neighbors_in + neighbors_out if n in contracted)
-        
+        # Contracted neighbors penalty spreads contraction evenly over the graph
         return edge_diff + contracted_neighbors
     
     def preprocess(self, max_nodes: int = None):
@@ -141,54 +156,79 @@ class ContractionHierarchies:
     def _contract_node(self, node_id: int, contracted: Set[int]):
         """Contract a node by adding necessary shortcuts."""
         # Find incoming edges from non-contracted nodes
-        incoming = []
-        for other_id, edges in self.original_graph.adj_list.items():
-            if other_id in contracted or other_id == node_id:
-                continue
-            for edge in edges:
-                if edge.target == node_id:
-                    incoming.append((other_id, edge.weight))
+        incoming = [
+            (edge.source, edge.weight) for edge in self.in_edges[node_id]
+            if edge.source not in contracted and edge.source != node_id
+        ]
         
         # Find outgoing edges to non-contracted nodes
-        outgoing = []
-        for edge in self.original_graph.get_edges(node_id):
-            if edge.target not in contracted and edge.target != node_id:
-                outgoing.append((edge.target, edge.weight))
+        outgoing = [
+            (edge.target, edge.weight) for edge in self.out_edges[node_id]
+            if edge.target not in contracted and edge.target != node_id
+        ]
+        
+        if not incoming or not outgoing:
+            return
+        max_out = max(w for _, w in outgoing)
         
         # Add shortcuts if needed
         for u, w_in in incoming:
+            witness = self._witness_search(u, node_id, contracted, w_in + max_out)
             for v, w_out in outgoing:
                 if u == v:
                     continue
                 
                 shortcut_weight = w_in + w_out
                 
-                # Check if shortcut is necessary (witness search)
-                # Simplified: always add shortcut (proper implementation would do witness search)
+                # Shortcut unnecessary if a path u -> v avoiding node_id is as short
+                if witness.get(v, float('inf')) <= shortcut_weight:
+                    continue
+                
                 shortcut = Shortcut(u, v, shortcut_weight, node_id)
                 self.shortcuts.append(shortcut)
                 
-                # Add to graph temporarily for further contractions
-                self.original_graph.adj_list[u].append(
-                    Edge(u, v, shortcut_weight, f"shortcut_via_{node_id}")
-                )
+                edge = ShortcutEdge(u, v, shortcut_weight, f"shortcut_via_{node_id}", via=node_id)
+                self.out_edges[u].append(edge)
+                self.in_edges[v].append(edge)
+    
+    def _witness_search(self, source: int, excluded: int, contracted: Set[int],
+                        max_dist: float) -> Dict[int, float]:
+        """
+        Dijkstra from source over non-contracted nodes, skipping `excluded`,
+        bounded by max_dist and WITNESS_SEARCH_LIMIT settled nodes.
+        Stopping early only adds unneeded shortcuts, never wrong ones.
+        """
+        dist: Dict[int, float] = {source: 0.0}
+        pq = [(0.0, source)]
+        settled = 0
+        while pq and settled < self.WITNESS_SEARCH_LIMIT:
+            d, u = heapq.heappop(pq)
+            if d > dist.get(u, float('inf')) or d > max_dist:
+                continue
+            settled += 1
+            for edge in self.out_edges[u]:
+                v = edge.target
+                if v == excluded or v in contracted:
+                    continue
+                new_dist = d + edge.weight
+                if new_dist < dist.get(v, float('inf')):
+                    dist[v] = new_dist
+                    heapq.heappush(pq, (new_dist, v))
+        return dist
     
     def _build_ch_graph(self):
         """Build upward and downward edge lists based on node levels."""
         # Include original edges + shortcuts
-        all_edges = []
-        for node_id, edges in self.original_graph.adj_list.items():
+        for edges in self.out_edges.values():
             for edge in edges:
-                all_edges.append(edge)
-        
-        for edge in all_edges:
-            src_level = self.ch_nodes[edge.source].level
-            tgt_level = self.ch_nodes[edge.target].level
-            
-            if tgt_level > src_level:
-                self.upward_edges[edge.source].append(edge)
-            else:
-                self.downward_edges[edge.source].append(edge)
+                src_level = self.ch_nodes[edge.source].level
+                tgt_level = self.ch_nodes[edge.target].level
+                
+                if tgt_level > src_level:
+                    self.upward_edges[edge.source].append(edge)
+                else:
+                    self.downward_edges[edge.source].append(edge)
+                    self.backward_upward_edges[edge.target].append(edge)
     
     def query(self, start: int, end: int) -> Tuple[float, List[int]]:
         """
@@ -249,18 +289,14 @@ class ContractionHierarchies:
                             best_dist = total
                             meeting_node = u
                     
-                    # In backward search, go upward = follow edges where this node is target
-                    for other_id, edges in self.original_graph.adj_list.items():
-                        for edge in edges:
-                            if edge.target == u:
-                                # Check if this is an upward edge from other's perspective
-                                if self.ch_nodes[u].level > self.ch_nodes[other_id].level:
-                                    v = other_id
-                                    new_dist = d + edge.weight
-                                    if new_dist < dist_backward.get(v, float('inf')):
-                                        dist_backward[v] = new_dist
-                                        prev_backward[v] = u
-                                        heapq.heappush(pq_backward, (new_dist, v))
+                    # In backward search, go upward = follow edges x -> u where x is higher than u
+                    for edge in self.backward_upward_edges.get(u, []):
+                        v = edge.source
+                        new_dist = d + edge.weight
+                        if new_dist < dist_backward.get(v, float('inf')):
+                            dist_backward[v] = new_dist
+                            prev_backward[v] = u
+                            heapq.heappush(pq_backward, (new_dist, v))
         
         if meeting_node is None:
             return float('inf'), []
@@ -286,4 +322,20 @@ class ContractionHierarchies:
             path_backward.append(node)
             node = prev_backward.get(node)
         
-        return path_forward + path_backward
+        return self._unpack_path(path_forward + path_backward)
+    
+    def _unpack_path(self, path: List[int]) -> List[int]:
+        """Replace every shortcut hop by the original nodes it bypasses."""
+        if not path:
+            return path
+        unpacked = [path[0]]
+        for u, v in zip(path, path[1:]):
+            unpacked.extend(self._unpack_edge(u, v)[1:])
+        return unpacked
+    
+    def _unpack_edge(self, u: int, v: int) -> List[int]:
+        # The query always uses the lightest edge u -> v
+        best = min((e for e in self.out_edges[u] if e.target == v), key=lambda e: e.weight)
+        if not isinstance(best, ShortcutEdge):
+            return [u, v]
+        return self._unpack_edge(u, best.via) + self._unpack_edge(best.via, v)[1:]

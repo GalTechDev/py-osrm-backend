@@ -4,11 +4,9 @@ OSM PBF Parser using osmium.
 Requires: pip install osmium
 """
 
-try:
-    import osmium
-    OSMIUM_AVAILABLE = True
-except ImportError:
-    OSMIUM_AVAILABLE = False
+# Raises ImportError when osmium is missing; GraphBuilder catches it
+# and falls back to XML-only support.
+import osmium
 
 from typing import Dict, List
 from ..structures.graph import Node
@@ -45,10 +43,6 @@ class PBFWayHandler(osmium.SimpleHandler):
 
 class OSMPBFParser:
     """Parser for OSM PBF files."""
-    
-    def __init__(self):
-        if not OSMIUM_AVAILABLE:
-            raise ImportError("osmium is required for PBF parsing. Install with: pip install osmium")
     
     def parse_nodes(self, file_path: str) -> Dict[int, Node]:
         """Parse nodes from a PBF file."""

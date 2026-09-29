@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>PY-OSRM-BACKEND | Documentation</title>
+    <meta name="description" content="Référence complète de py-osrm-backend : graphe, extraction OSM, Dijkstra, Contraction Hierarchies et API REST.">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/config.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+    class="bg-background text-on-surface font-body-base antialiased flex h-screen overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-30 hidden transition-opacity duration-300 opacity-0"></div>
+
+    <!-- SideNavBar -->
+    <aside id="sidebar"
+        class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-surface-bright border-r border-outline-variant z-40 transition-transform duration-300 -translate-x-full md:translate-x-0">
+        <div class="p-6 border-b border-outline-variant relative">
+            <button id="close-menu-btn" class="md:hidden absolute top-4 right-4 text-outline hover:text-primary">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <a href="index.html" class="flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined fill-icon text-primary">route</span>
+                <h2 class="font-headline-md text-[20px] text-primary">PY-OSRM</h2>
+            </a>
+            <div class="flex justify-center mt-3">
+                <span class="inline-block px-2 py-0.5 bg-[#eafdf0] text-[#006e0b] border border-[#a1e8af] font-label-caps text-[10px] uppercase">v0.1.1 · MIT</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 py-4 flex flex-col overflow-y-auto">
+            <a href="index.html"
+                class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:bg-surface-container transition-all">
+                <span class="material-symbols-outlined">home</span>
+                <span class="font-label-caps text-label-caps uppercase" data-en="HOME" data-fr="ACCUEIL">ACCUEIL</span>
+            </a>
+            <a href="wiki.html"
+                class="flex items-center gap-4 px-6 py-4 transition-all bg-primary-container text-on-primary-container border-r-4 border-primary">
+                <span class="material-symbols-outlined fill-icon">menu_book</span>
+                <span class="font-label-caps text-label-caps uppercase">DOCUMENTATION</span>
+            </a>
+
+            <!-- Table of contents -->
+            <div class="px-6 pt-6 pb-2 font-label-caps text-[10px] text-outline uppercase" data-en="Getting started" data-fr="Démarrage">Démarrage</div>
+            <a href="#installation" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors">Installation</a>
+            <a href="#architecture" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors">Architecture</a>
+
+            <div class="px-6 pt-6 pb-2 font-label-caps text-[10px] text-outline uppercase" data-en="Library" data-fr="Bibliothèque">Bibliothèque</div>
+            <a href="#graph" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors" data-en="Graph" data-fr="Graphe">Graphe</a>
+            <a href="#extractor" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors" data-en="OSM extraction" data-fr="Extraction OSM">Extraction OSM</a>
+            <a href="#dijkstra" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors">Dijkstra</a>
+            <a href="#ch" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors">Contraction Hierarchies</a>
+
+            <div class="px-6 pt-6 pb-2 font-label-caps text-[10px] text-outline uppercase" data-en="Server" data-fr="Serveur">Serveur</div>
+            <a href="#server" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors" data-en="Run the server" data-fr="Lancer le serveur">Lancer le serveur</a>
+            <a href="#route-endpoint" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors" data-en="Route endpoint" data-fr="Endpoint route">Endpoint route</a>
+            <a href="#docker" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors">Docker</a>
+
+            <div class="px-6 pt-6 pb-2 font-label-caps text-[10px] text-outline uppercase" data-en="Project" data-fr="Projet">Projet</div>
+            <a href="#tests" class="toc-link block ml-6 mr-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors">Tests</a>
+            <a href="#limitations" class="toc-link block ml-6 mr-4 mb-4 pl-4 py-2 border-l-2 border-outline-variant font-code-snippet text-[12px] text-on-surface-variant hover:text-primary transition-colors" data-en="Limitations" data-fr="Limites">Limites</a>
+        </nav>
+
+        <a href="https://github.com/GalTechDev/py-osrm-backend" target="_blank" rel="noopener noreferrer"
+            class="p-6 border-t border-outline-variant flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined">code</span>
+            <span class="font-label-caps text-[11px] uppercase">GalTechDev/py-osrm-backend</span>
+        </a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div id="main-scroll" class="flex-1 flex flex-col min-w-0 md:ml-64 h-screen overflow-y-scroll relative data-grid-pattern scroll-smooth">
+
+        <!-- TopAppBar -->
+        <header
+            class="w-full top-0 sticky shrink-0 bg-surface/90 backdrop-blur-sm border-b border-outline-variant flex justify-between items-center h-16 px-gutter z-30">
+            <div class="flex items-center gap-4 min-w-0">
+                <button id="open-menu-btn"
+                    class="md:hidden text-primary p-2 -ml-2 rounded hover:bg-surface-container-low transition-colors">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <h1 id="topbar-title"
+                    class="font-display-lg text-[20px] md:text-display-lg-mobile text-primary tracking-tighter uppercase truncate">DOCUMENTATION</h1>
+            </div>
+            <button id="lang-btn"
+                class="flex items-center gap-2 px-4 py-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant rounded-full text-primary shadow-sm transition-all hover:shadow-md shrink-0"
+                title="Langue / Language">
+                <span class="font-label-caps text-label-caps">EN</span>
+                <span class="material-symbols-outlined text-[20px]">translate</span>
+            </button>
+        </header>
+
+        <main class="flex-1 flex flex-col fade-in">
+            <div class="w-full p-margin-mobile md:p-gutter">
+                <article class="prose-doc max-w-4xl mx-auto w-full font-body-base text-[16px] text-on-surface leading-relaxed pb-12">
+
+                    <!-- Page header -->
+                    <div class="mb-12 border-b border-outline-variant pb-4 pt-4">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="font-code-snippet text-[12px] text-secondary border border-secondary px-3 py-1" data-en="REFERENCE" data-fr="RÉFÉRENCE">RÉFÉRENCE</span>
+                            <span class="font-label-caps text-[12px] text-on-surface-variant">py-osrm-backend 0.1.1 · Python ≥ 3.8</span>
+                        </div>
+                        <h2 class="font-display-lg text-[32px] md:text-[48px] text-on-background uppercase tracking-tight leading-tight mb-4">
+                            Documentation</h2>
+                        <p class="text-[18px] md:text-[20px] font-medium text-primary"
+                            data-en="Everything you need to route on OpenStreetMap data from Python: the graph model, extraction, routing engines and the REST server."
+                            data-fr="Tout ce qu'il faut pour router sur des données OpenStreetMap depuis Python : le modèle de graphe, l'extraction, les moteurs de routage et le serveur REST.">
+                            Tout ce qu'il faut pour router sur des données OpenStreetMap depuis Python : le modèle de graphe, l'extraction, les moteurs de routage et le serveur REST.</p>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- INSTALLATION                                   -->
+                    <!-- ============================================== -->
+                    <section id="installation" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">01</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2">Installation</h2>
+                        <div class="flex items-stretch border border-outline-variant bg-surface-container-lowest shadow-sm max-w-md">
+                            <span class="flex items-center px-4 border-r border-outline-variant text-primary font-code-snippet">$</span>
+                            <code class="flex-1 flex items-center px-4 py-3 font-code-snippet text-[14px] text-on-surface">pip install py-osrm-backend</code>
+                            <button data-copy="pip install py-osrm-backend"
+                                class="px-4 border-l border-outline-variant text-outline hover:text-primary hover:bg-surface-container-low transition-colors" title="Copier">
+                                <span class="material-symbols-outlined text-[20px]">content_copy</span>
+                            </button>
+                        </div>
+                        <p data-en="Two dependencies are installed: <code>flask</code> for the REST server and <code>osmium</code> for PBF files. XML files only need the standard library. The package is imported as <code>osrm</code>."
+                            data-fr="Deux dépendances sont installées : <code>flask</code> pour le serveur REST et <code>osmium</code> pour les fichiers PBF. Les fichiers XML n'ont besoin que de la bibliothèque standard. Le paquet s'importe sous le nom <code>osrm</code>.">
+                            Deux dépendances sont installées : <code>flask</code> pour le serveur REST et <code>osmium</code> pour les fichiers PBF. Les fichiers XML n'ont besoin que de la bibliothèque standard. Le paquet s'importe sous le nom <code>osrm</code>.</p>
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">terminal</span>dev
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="cm"># Depuis les sources, avec pytest, build et twine</span>
+git clone https://github.com/GalTechDev/py-osrm-backend
+cd py-osrm-backend
+pip install -e <span class="str">".[dev]"</span></pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- ARCHITECTURE                                   -->
+                    <!-- ============================================== -->
+                    <section id="architecture" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">02</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2">Architecture</h2>
+                        <p data-en="The package mirrors OSRM's own split: an <em>extractor</em> turns the map into a graph, an <em>engine</em> answers queries, a <em>server</em> exposes them over HTTP. <code>Graph</code>, <code>GraphBuilder</code> and <code>DijkstraEngine</code> are re-exported at the top level."
+                            data-fr="Le paquet reprend le découpage d'OSRM : un <em>extractor</em> transforme la carte en graphe, un <em>engine</em> répond aux requêtes, un <em>server</em> les expose en HTTP. <code>Graph</code>, <code>GraphBuilder</code> et <code>DijkstraEngine</code> sont ré-exportés à la racine.">
+                            Le paquet reprend le découpage d'OSRM : un <em>extractor</em> transforme la carte en graphe, un <em>engine</em> répond aux requêtes, un <em>server</em> les expose en HTTP. <code>Graph</code>, <code>GraphBuilder</code> et <code>DijkstraEngine</code> sont ré-exportés à la racine.</p>
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <thead class="bg-surface border-b border-outline-variant">
+                                    <tr class="font-label-caps text-[11px] text-outline uppercase">
+                                        <th class="p-4">Module</th>
+                                        <th class="p-4" data-en="Contents" data-fr="Contenu">Contenu</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.structures.graph</td>
+                                        <td class="p-4"><code>Node</code>, <code>Edge</code>, <code>Graph</code>, <code>haversine_distance</code></td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.extractor.graph_builder</td>
+                                        <td class="p-4"><code>GraphBuilder</code></td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.extractor.parser</td>
+                                        <td class="p-4"><code>OSMParser</code> <span class="text-outline">(XML)</span></td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.extractor.pbf_parser</td>
+                                        <td class="p-4"><code>OSMPBFParser</code> <span class="text-outline">(PBF, osmium)</span></td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.engine.dijkstra</td>
+                                        <td class="p-4"><code>DijkstraEngine</code></td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.engine.contraction_hierarchies</td>
+                                        <td class="p-4"><code>ContractionHierarchies</code>, <code>CHNode</code>, <code>Shortcut</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">osrm.server.api</td>
+                                        <td class="p-4" data-en="Flask <code>app</code>, <code>init_app()</code>" data-fr="<code>app</code> Flask, <code>init_app()</code>"><code>app</code> Flask, <code>init_app()</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- GRAPH                                          -->
+                    <!-- ============================================== -->
+                    <section id="graph" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">03</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2" data-en="The graph" data-fr="Le graphe">Le graphe</h2>
+                        <p data-en="A directed graph stored as an adjacency list. Nodes are keyed by their OSM id; each <code>Edge</code> carries a weight (kilometres when built from a map) and the street name. A two-way street is simply two edges."
+                            data-fr="Un graphe orienté stocké sous forme de liste d'adjacence. Les nœuds sont indexés par leur identifiant OSM ; chaque <code>Edge</code> porte un poids (en kilomètres quand il vient d'une carte) et le nom de la rue. Une rue à double sens correspond simplement à deux arêtes.">
+                            Un graphe orienté stocké sous forme de liste d'adjacence. Les nœuds sont indexés par leur identifiant OSM ; chaque <code>Edge</code> porte un poids (en kilomètres quand il vient d'une carte) et le nom de la rue. Une rue à double sens correspond simplement à deux arêtes.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-base">
+                            <div class="bg-surface border border-outline-variant shadow-sm">
+                                <div class="p-4 border-b border-outline-variant bg-surface-bright font-headline-md text-[16px] text-primary uppercase">Node</div>
+                                <div class="p-4 font-code-snippet text-[12px] text-on-surface-variant">id: int, lat: float, lon: float, tags: Dict[str, str]</div>
+                            </div>
+                            <div class="bg-surface border border-outline-variant shadow-sm">
+                                <div class="p-4 border-b border-outline-variant bg-surface-bright font-headline-md text-[16px] text-primary uppercase">Edge</div>
+                                <div class="p-4 font-code-snippet text-[12px] text-on-surface-variant">source: int, target: int, weight: float, name: str = ""</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">code</span>example.py
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="kw">from</span> osrm <span class="kw">import</span> Graph
+<span class="kw">from</span> osrm.structures.graph <span class="kw">import</span> haversine_distance
+
+g = <span class="fn">Graph</span>()
+g.<span class="fn">add_node</span>(<span class="num">1</span>, <span class="num">48.8566</span>, <span class="num">2.3522</span>)                   <span class="cm"># Paris</span>
+g.<span class="fn">add_node</span>(<span class="num">2</span>, <span class="num">45.7640</span>, <span class="num">4.8357</span>, {<span class="str">"name"</span>: <span class="str">"Lyon"</span>})
+
+d = <span class="fn">haversine_distance</span>(<span class="num">48.8566</span>, <span class="num">2.3522</span>, <span class="num">45.7640</span>, <span class="num">4.8357</span>)  <span class="cm"># ~392 km</span>
+g.<span class="fn">add_edge</span>(<span class="num">1</span>, <span class="num">2</span>, d, name=<span class="str">"A6"</span>)
+g.<span class="fn">add_edge</span>(<span class="num">2</span>, <span class="num">1</span>, d, name=<span class="str">"A6"</span>)                <span class="cm"># sens inverse</span>
+
+<span class="fn">len</span>(g)                  <span class="cm"># 2</span>
+g.<span class="fn">get_edges</span>(<span class="num">1</span>)          <span class="cm"># [Edge(source=1, target=2, ...)]</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">add_node(id, lat, lon, tags=None)</td>
+                                        <td class="p-4" data-en="Adds (or replaces) a node and creates its empty adjacency list." data-fr="Ajoute (ou remplace) un nœud et crée sa liste d'adjacence vide.">Ajoute (ou remplace) un nœud et crée sa liste d'adjacence vide.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">add_edge(source, target, weight, name="")</td>
+                                        <td class="p-4" data-en="Adds a <strong>directed</strong> edge. Raises <code>ValueError</code> if either node is missing." data-fr="Ajoute une arête <strong>orientée</strong>. Lève <code>ValueError</code> si l'un des nœuds est absent.">Ajoute une arête <strong>orientée</strong>. Lève <code>ValueError</code> si l'un des nœuds est absent.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">get_edges(node_id)</td>
+                                        <td class="p-4" data-en="Outgoing edges of a node (empty list if unknown)." data-fr="Arêtes sortantes d'un nœud (liste vide s'il est inconnu).">Arêtes sortantes d'un nœud (liste vide s'il est inconnu).</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">get_node(node_id)</td>
+                                        <td class="p-4" data-en="The <code>Node</code>, or <code>None</code>." data-fr="Le <code>Node</code>, ou <code>None</code>.">Le <code>Node</code>, ou <code>None</code>.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">nodes / adj_list</td>
+                                        <td class="p-4" data-en="The underlying dictionaries: <code>{id: Node}</code> and <code>{id: [Edge]}</code>." data-fr="Les dictionnaires sous-jacents : <code>{id: Node}</code> et <code>{id: [Edge]}</code>.">Les dictionnaires sous-jacents : <code>{id: Node}</code> et <code>{id: [Edge]}</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">haversine_distance(lat1, lon1, lat2, lon2)</td>
+                                        <td class="p-4" data-en="Great-circle distance in kilometres (Earth radius 6371 km)." data-fr="Distance orthodromique en kilomètres (rayon terrestre 6371 km).">Distance orthodromique en kilomètres (rayon terrestre 6371 km).</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- EXTRACTOR                                      -->
+                    <!-- ============================================== -->
+                    <section id="extractor" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">04</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2" data-en="OSM extraction" data-fr="Extraction OSM">Extraction OSM</h2>
+                        <p data-en="<code>GraphBuilder.build_graph(file_path)</code> reads a map and returns a ready-to-route <code>Graph</code>. Files ending in <code>.pbf</code> go through <code>osmium</code>; everything else is parsed as OSM XML."
+                            data-fr="<code>GraphBuilder.build_graph(file_path)</code> lit une carte et renvoie un <code>Graph</code> prêt à router. Les fichiers terminant par <code>.pbf</code> passent par <code>osmium</code> ; tout le reste est lu comme de l'OSM XML.">
+                            <code>GraphBuilder.build_graph(file_path)</code> lit une carte et renvoie un <code>Graph</code> prêt à router. Les fichiers terminant par <code>.pbf</code> passent par <code>osmium</code> ; tout le reste est lu comme de l'OSM XML.</p>
+
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm">
+                            <div class="p-4 border-b border-outline-variant bg-surface font-label-caps text-[11px] text-outline uppercase" data-en="Build steps" data-fr="Étapes de construction">Étapes de construction</div>
+                            <ol class="p-6 space-y-3 text-[14px] text-on-surface-variant list-none">
+                                <li class="flex gap-3"><span class="font-code-snippet text-primary">1.</span>
+                                    <span data-en="Every node is added to the graph with its coordinates and tags." data-fr="Chaque nœud est ajouté au graphe avec ses coordonnées et ses tags.">Chaque nœud est ajouté au graphe avec ses coordonnées et ses tags.</span></li>
+                                <li class="flex gap-3"><span class="font-code-snippet text-primary">2.</span>
+                                    <span data-en="Only ways carrying a <code>highway</code> tag are kept (roads, paths, footways…)." data-fr="Seules les voies portant un tag <code>highway</code> sont conservées (routes, chemins, trottoirs…).">Seules les voies portant un tag <code>highway</code> sont conservées (routes, chemins, trottoirs…).</span></li>
+                                <li class="flex gap-3"><span class="font-code-snippet text-primary">3.</span>
+                                    <span data-en="Each pair of consecutive nodes becomes an edge weighted by the haversine distance and named after the way's <code>name</code> tag." data-fr="Chaque paire de nœuds consécutifs devient une arête pondérée par la distance haversine et nommée d'après le tag <code>name</code> de la voie.">Chaque paire de nœuds consécutifs devient une arête pondérée par la distance haversine et nommée d'après le tag <code>name</code> de la voie.</span></li>
+                                <li class="flex gap-3"><span class="font-code-snippet text-primary">4.</span>
+                                    <span data-en="A reverse edge is added unless the way has <code>oneway=yes</code>. Segments referencing nodes outside the extract are skipped." data-fr="Une arête inverse est ajoutée sauf si la voie a <code>oneway=yes</code>. Les segments qui référencent des nœuds hors de l'extrait sont ignorés.">Une arête inverse est ajoutée sauf si la voie a <code>oneway=yes</code>. Les segments qui référencent des nœuds hors de l'extrait sont ignorés.</span></li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">code</span>example.py
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="kw">from</span> osrm <span class="kw">import</span> GraphBuilder
+<span class="kw">from</span> osrm.extractor.parser <span class="kw">import</span> OSMParser
+
+<span class="cm"># Pipeline complet</span>
+graph = <span class="fn">GraphBuilder</span>().<span class="fn">build_graph</span>(<span class="str">"new-caledonia.osm.pbf"</span>)
+
+<span class="cm"># Ou les parsers seuls, pour vos propres filtres</span>
+parser = <span class="fn">OSMParser</span>()
+nodes = parser.<span class="fn">parse_nodes</span>(<span class="str">"map.osm"</span>)  <span class="cm"># {id: Node}</span>
+ways = parser.<span class="fn">parse_ways</span>(<span class="str">"map.osm"</span>)    <span class="cm"># [{"id", "nodes", "tags"}]</span>
+bus = [w <span class="kw">for</span> w <span class="kw">in</span> ways <span class="kw">if</span> w[<span class="str">"tags"</span>].<span class="fn">get</span>(<span class="str">"bus"</span>) == <span class="str">"yes"</span>]</pre>
+                            </div>
+                        </div>
+                        <p data-en="<code>OSMParser</code> (XML) and <code>OSMPBFParser</code> (PBF) share the same interface: <code>parse_nodes(path)</code> and <code>parse_ways(path)</code>. The XML parser streams the file with <code>iterparse</code> and frees each element once read."
+                            data-fr="<code>OSMParser</code> (XML) et <code>OSMPBFParser</code> (PBF) partagent la même interface : <code>parse_nodes(path)</code> et <code>parse_ways(path)</code>. Le parser XML lit le fichier en flux avec <code>iterparse</code> et libère chaque élément une fois lu.">
+                            <code>OSMParser</code> (XML) et <code>OSMPBFParser</code> (PBF) partagent la même interface : <code>parse_nodes(path)</code> et <code>parse_ways(path)</code>. Le parser XML lit le fichier en flux avec <code>iterparse</code> et libère chaque élément une fois lu.</p>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- DIJKSTRA                                       -->
+                    <!-- ============================================== -->
+                    <section id="dijkstra" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">05</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2">Dijkstra</h2>
+                        <p data-en="The default engine, and the one used by the REST server. No preprocessing: create it and query right away. The search stops as soon as the destination is settled."
+                            data-fr="Le moteur par défaut, et celui qu'utilise le serveur REST. Aucun pré-traitement : créez-le et interrogez-le tout de suite. La recherche s'arrête dès que la destination est atteinte.">
+                            Le moteur par défaut, et celui qu'utilise le serveur REST. Aucun pré-traitement : créez-le et interrogez-le tout de suite. La recherche s'arrête dès que la destination est atteinte.</p>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-primary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-primary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">code</span>signature
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="fn">DijkstraEngine</span>(graph: Graph)
+
+engine.<span class="fn">shortest_path</span>(
+    start_node_id: int,
+    end_node_id: int,
+) -> Tuple[float, List[int]]</pre>
+                            </div>
+                        </div>
+
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <thead class="bg-surface border-b border-outline-variant">
+                                    <tr class="font-label-caps text-[11px] text-outline uppercase">
+                                        <th class="p-4" data-en="Case" data-fr="Cas">Cas</th>
+                                        <th class="p-4" data-en="Result" data-fr="Résultat">Résultat</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4" data-en="Path found" data-fr="Chemin trouvé">Chemin trouvé</td>
+                                        <td class="p-4 font-code-snippet text-[13px]" data-en="(distance, [start, …, end])" data-fr="(distance, [départ, …, arrivée])">(distance, [départ, …, arrivée])</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4" data-en="No path" data-fr="Aucun chemin">Aucun chemin</td>
+                                        <td class="p-4 font-code-snippet text-[13px]">(inf, [])</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4" data-en="Unknown node" data-fr="Nœud inconnu">Nœud inconnu</td>
+                                        <td class="p-4 font-code-snippet text-[13px] text-error">ValueError</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">code</span>example.py
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="kw">import</span> math
+<span class="kw">from</span> osrm <span class="kw">import</span> DijkstraEngine
+
+engine = <span class="fn">DijkstraEngine</span>(graph)
+distance, path = engine.<span class="fn">shortest_path</span>(start_id, end_id)
+
+<span class="kw">if</span> math.<span class="fn">isinf</span>(distance):
+    <span class="fn">print</span>(<span class="str">"Aucun itinéraire"</span>)
+<span class="kw">else</span>:
+    coords = [(graph.nodes[n].lat, graph.nodes[n].lon) <span class="kw">for</span> n <span class="kw">in</span> path]</pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- CONTRACTION HIERARCHIES                        -->
+                    <!-- ============================================== -->
+                    <section id="ch" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">06</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2">Contraction Hierarchies</h2>
+                        <p data-en="The speed-up technique OSRM is built on. <code>preprocess()</code> contracts nodes from least to most important and adds a <em>shortcut</em> for every path that went through them. <code>query()</code> then runs a bidirectional search that only climbs the hierarchy."
+                            data-fr="La technique d'accélération sur laquelle repose OSRM. <code>preprocess()</code> contracte les nœuds du moins au plus important et ajoute un <em>raccourci</em> pour chaque chemin qui passait par eux. <code>query()</code> lance ensuite une recherche bidirectionnelle qui ne fait que monter dans la hiérarchie.">
+                            La technique d'accélération sur laquelle repose OSRM. <code>preprocess()</code> contracte les nœuds du moins au plus important et ajoute un <em>raccourci</em> pour chaque chemin qui passait par eux. <code>query()</code> lance ensuite une recherche bidirectionnelle qui ne fait que monter dans la hiérarchie.</p>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">code</span>example.py
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="kw">from</span> osrm.engine.contraction_hierarchies <span class="kw">import</span> ContractionHierarchies
+
+ch = <span class="fn">ContractionHierarchies</span>(graph)
+ch.<span class="fn">preprocess</span>()                  <span class="cm"># une fois</span>
+
+distance, path = ch.<span class="fn">query</span>(start_id, end_id)
+<span class="fn">print</span>(<span class="fn">len</span>(ch.shortcuts), <span class="str">"raccourcis"</span>)</pre>
+                            </div>
+                        </div>
+
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">preprocess(max_nodes=None)</td>
+                                        <td class="p-4" data-en="Computes the contraction order (edge difference + contracted neighbours, lazily updated) and builds the upward/downward edge lists. <code>max_nodes</code> limits the work, for tests." data-fr="Calcule l'ordre de contraction (différence d'arêtes + voisins contractés, mis à jour paresseusement) et construit les listes d'arêtes montantes/descendantes. <code>max_nodes</code> limite le travail, pour les tests.">Calcule l'ordre de contraction (différence d'arêtes + voisins contractés, mis à jour paresseusement) et construit les listes d'arêtes montantes/descendantes. <code>max_nodes</code> limite le travail, pour les tests.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">query(start, end)</td>
+                                        <td class="p-4" data-en="Returns <code>(distance, path)</code> like Dijkstra, or <code>(inf, [])</code>. Raises <code>ValueError</code> for an unknown node." data-fr="Renvoie <code>(distance, path)</code> comme Dijkstra, ou <code>(inf, [])</code>. Lève <code>ValueError</code> pour un nœud inconnu.">Renvoie <code>(distance, path)</code> comme Dijkstra, ou <code>(inf, [])</code>. Lève <code>ValueError</code> pour un nœud inconnu.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">ch_nodes</td>
+                                        <td class="p-4" data-en="<code>{id: CHNode(id, level, contracted)}</code>: the rank of each node in the hierarchy." data-fr="<code>{id: CHNode(id, level, contracted)}</code> : le rang de chaque nœud dans la hiérarchie."><code>{id: CHNode(id, level, contracted)}</code> : le rang de chaque nœud dans la hiérarchie.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">shortcuts</td>
+                                        <td class="p-4" data-en="List of <code>Shortcut(source, target, weight, via)</code>, where <code>via</code> is the contracted node." data-fr="Liste de <code>Shortcut(source, target, weight, via)</code>, où <code>via</code> est le nœud contracté.">Liste de <code>Shortcut(source, target, weight, via)</code>, où <code>via</code> est le nœud contracté.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="bg-surface-container-lowest border border-outline-variant border-l-4 border-l-primary p-4 flex gap-3 text-[14px] text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary">info</span>
+                            <p data-en="The <code>Graph</code> you pass in is never modified: shortcuts live inside the <code>ContractionHierarchies</code> object, so the same graph can still feed a <code>DijkstraEngine</code>. The returned path is unpacked and only contains original nodes. A witness search (bounded to <code>WITNESS_SEARCH_LIMIT</code> = 500 settled nodes) skips the shortcuts that are not needed."
+                                data-fr="Le <code>Graph</code> fourni n'est jamais modifié : les raccourcis vivent dans l'objet <code>ContractionHierarchies</code>, le même graphe peut donc toujours alimenter un <code>DijkstraEngine</code>. Le chemin renvoyé est déplié et ne contient que des nœuds d'origine. Une witness search (limitée à <code>WITNESS_SEARCH_LIMIT</code> = 500 nœuds visités) évite les raccourcis inutiles.">
+                                Le <code>Graph</code> fourni n'est jamais modifié : les raccourcis vivent dans l'objet <code>ContractionHierarchies</code>, le même graphe peut donc toujours alimenter un <code>DijkstraEngine</code>. Le chemin renvoyé est déplié et ne contient que des nœuds d'origine. Une witness search (limitée à <code>WITNESS_SEARCH_LIMIT</code> = 500 nœuds visités) évite les raccourcis inutiles.</p>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- SERVER                                         -->
+                    <!-- ============================================== -->
+                    <section id="server" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">07</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2" data-en="Run the server" data-fr="Lancer le serveur">Lancer le serveur</h2>
+                        <p data-en="<code>osrm.server.api</code> holds a module-level Flask <code>app</code>. Call <code>init_app(path)</code> once to build the graph and the Dijkstra engine, then run the app like any Flask application."
+                            data-fr="<code>osrm.server.api</code> contient une <code>app</code> Flask au niveau du module. Appelez <code>init_app(path)</code> une fois pour construire le graphe et le moteur Dijkstra, puis lancez l'app comme n'importe quelle application Flask.">
+                            <code>osrm.server.api</code> contient une <code>app</code> Flask au niveau du module. Appelez <code>init_app(path)</code> une fois pour construire le graphe et le moteur Dijkstra, puis lancez l'app comme n'importe quelle application Flask.</p>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">code</span>run_server.py
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block"><span class="kw">from</span> osrm.server.api <span class="kw">import</span> app, init_app
+
+<span class="fn">init_app</span>(<span class="str">"data/new-caledonia.osm.pbf"</span>)  <span class="cm"># FileNotFoundError si absent</span>
+app.<span class="fn">run</span>(host=<span class="str">"0.0.0.0"</span>, port=<span class="num">5000</span>)</pre>
+                            </div>
+                        </div>
+                        <p data-en="Or directly from the command line, configured through environment variables:"
+                            data-fr="Ou directement en ligne de commande, configuré par variables d'environnement :">
+                            Ou directement en ligne de commande, configuré par variables d'environnement :</p>
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block">OSRM_FILE=map.osm.pbf python -m osrm.server.api</pre>
+                            </div>
+                        </div>
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <thead class="bg-surface border-b border-outline-variant">
+                                    <tr class="font-label-caps text-[11px] text-outline uppercase">
+                                        <th class="p-4" data-en="Variable" data-fr="Variable">Variable</th>
+                                        <th class="p-4" data-en="Default" data-fr="Défaut">Défaut</th>
+                                        <th class="p-4">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">OSRM_FILE</td>
+                                        <td class="p-4 font-code-snippet text-[13px]">data.osm</td>
+                                        <td class="p-4" data-en="Map to load (<code>.osm</code> or <code>.osm.pbf</code>)." data-fr="Carte à charger (<code>.osm</code> ou <code>.osm.pbf</code>).">Carte à charger (<code>.osm</code> ou <code>.osm.pbf</code>).</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">OSRM_HOST</td>
+                                        <td class="p-4 font-code-snippet text-[13px]">127.0.0.1</td>
+                                        <td class="p-4" data-en="Listening address (<code>0.0.0.0</code> to expose it)." data-fr="Adresse d'écoute (<code>0.0.0.0</code> pour l'exposer).">Adresse d'écoute (<code>0.0.0.0</code> pour l'exposer).</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">OSRM_PORT</td>
+                                        <td class="p-4 font-code-snippet text-[13px]">5000</td>
+                                        <td class="p-4" data-en="Listening port." data-fr="Port d'écoute.">Port d'écoute.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">FLASK_DEBUG</td>
+                                        <td class="p-4 font-code-snippet text-[13px]">—</td>
+                                        <td class="p-4" data-en="<code>1</code> enables Flask debug mode." data-fr="<code>1</code> active le mode debug de Flask."><code>1</code> active le mode debug de Flask.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p data-en="<code>GET /health</code> returns <code>{&quot;status&quot;: &quot;ok&quot;, &quot;nodes&quot;: N}</code> once the graph is loaded, or <code>503</code> before that."
+                            data-fr="<code>GET /health</code> renvoie <code>{&quot;status&quot;: &quot;ok&quot;, &quot;nodes&quot;: N}</code> une fois le graphe chargé, ou <code>503</code> avant.">
+                            <code>GET /health</code> renvoie <code>{"status": "ok", "nodes": N}</code> une fois le graphe chargé, ou <code>503</code> avant.</p>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- ROUTE ENDPOINT                                 -->
+                    <!-- ============================================== -->
+                    <section id="route-endpoint" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">08</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2" data-en="Route endpoint" data-fr="Endpoint route">Endpoint route</h2>
+
+                        <div class="flex items-stretch border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <span class="flex items-center px-4 border-r border-outline-variant bg-primary text-on-primary font-label-caps text-[12px]">GET</span>
+                            <code class="flex-1 flex items-center px-4 py-3 font-code-snippet text-[14px] text-on-surface whitespace-nowrap">/route/v1/driving/{lon},{lat};{lon},{lat}[;…]</code>
+                        </div>
+                        <p data-en="Same URL shape as OSRM: <strong>longitude first</strong>, coordinates separated by <code>;</code>. Two or more waypoints are accepted; each one is snapped to the closest node connected to at least one edge, and the legs are chained into a single route."
+                            data-fr="Même forme d'URL qu'OSRM : <strong>longitude en premier</strong>, coordonnées séparées par <code>;</code>. Deux points de passage ou plus sont acceptés ; chacun est accroché au nœud le plus proche relié à au moins une arête, et les tronçons sont enchaînés en un seul itinéraire.">
+                            Même forme d'URL qu'OSRM : <strong>longitude en premier</strong>, coordonnées séparées par <code>;</code>. Deux points de passage ou plus sont acceptés ; chacun est accroché au nœud le plus proche relié à au moins une arête, et les tronçons sont enchaînés en un seul itinéraire.</p>
+
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <h4 class="font-code-snippet text-[14px] text-secondary uppercase mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">terminal</span>200 OK
+                            </h4>
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block">$ curl <span class="str">"localhost:5000/route/v1/driving/166.44,-22.27;166.46,-22.29;166.47,-22.30"</span>
+
+{
+  <span class="str">"code"</span>: <span class="str">"Ok"</span>,
+  <span class="str">"routes"</span>: [{
+    <span class="str">"distance"</span>: <span class="num">4870.2</span>,
+    <span class="str">"duration"</span>: <span class="num">352.9</span>,
+    <span class="str">"geometry"</span>: {
+      <span class="str">"type"</span>: <span class="str">"LineString"</span>,
+      <span class="str">"coordinates"</span>: [[<span class="num">166.4401</span>, <span class="num">-22.2703</span>], ...]
+    }
+  }]
+}</pre>
+                            </div>
+                        </div>
+
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <thead class="bg-surface border-b border-outline-variant">
+                                    <tr class="font-label-caps text-[11px] text-outline uppercase">
+                                        <th class="p-4" data-en="Field" data-fr="Champ">Champ</th>
+                                        <th class="p-4">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">distance</td>
+                                        <td class="p-4" data-en="Total length in <strong>metres</strong>, like OSRM." data-fr="Longueur totale en <strong>mètres</strong>, comme OSRM.">Longueur totale en <strong>mètres</strong>, comme OSRM.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">duration</td>
+                                        <td class="p-4" data-en="Estimated time in <strong>seconds</strong>, at a constant 50 km/h (<code>AVERAGE_SPEED_MPS</code> = 13.8 m/s): there is no speed profile yet." data-fr="Temps estimé en <strong>secondes</strong>, à 50 km/h constants (<code>AVERAGE_SPEED_MPS</code> = 13,8 m/s) : il n'y a pas encore de profil de vitesse.">Temps estimé en <strong>secondes</strong>, à 50 km/h constants (<code>AVERAGE_SPEED_MPS</code> = 13,8 m/s) : il n'y a pas encore de profil de vitesse.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-code-snippet text-primary whitespace-nowrap">geometry</td>
+                                        <td class="p-4" data-en="GeoJSON <code>LineString</code> of <code>[lon, lat]</code> pairs, ready for Leaflet or MapLibre." data-fr="<code>LineString</code> GeoJSON de paires <code>[lon, lat]</code>, prête pour Leaflet ou MapLibre."><code>LineString</code> GeoJSON de paires <code>[lon, lat]</code>, prête pour Leaflet ou MapLibre.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="font-headline-md text-[18px] text-on-background uppercase pt-4" data-en="Error codes" data-fr="Codes d'erreur">Codes d'erreur</h3>
+                        <div class="border border-outline-variant bg-surface-container-lowest shadow-sm overflow-x-auto">
+                            <table class="w-full text-left text-[14px]">
+                                <tbody class="text-on-surface-variant">
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-error whitespace-nowrap">400 InvalidRequest</td>
+                                        <td class="p-4" data-en="Fewer than two coordinates, or a coordinate that is not <code>lon,lat</code>." data-fr="Moins de deux coordonnées, ou une coordonnée qui n'est pas au format <code>lon,lat</code>.">Moins de deux coordonnées, ou une coordonnée qui n'est pas au format <code>lon,lat</code>.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-error whitespace-nowrap">400 NoSegment</td>
+                                        <td class="p-4" data-en="No routable node could be found for a coordinate." data-fr="Aucun nœud routable n'a été trouvé pour une coordonnée.">Aucun nœud routable n'a été trouvé pour une coordonnée.</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant">
+                                        <td class="p-4 font-code-snippet text-error whitespace-nowrap">404 NoRoute</td>
+                                        <td class="p-4" data-en="Two consecutive waypoints are not connected in the graph." data-fr="Deux points de passage consécutifs ne sont pas reliés dans le graphe.">Deux points de passage consécutifs ne sont pas reliés dans le graphe.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-code-snippet text-error whitespace-nowrap">500 Error</td>
+                                        <td class="p-4" data-en="Unexpected exception; <code>message</code> contains its text." data-fr="Exception inattendue ; <code>message</code> contient son texte.">Exception inattendue ; <code>message</code> contient son texte.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-[14px] text-on-surface-variant" data-en="Every error body has the form <code>{&quot;code&quot;: …, &quot;message&quot;: …}</code>." data-fr="Chaque corps d'erreur a la forme <code>{&quot;code&quot;: …, &quot;message&quot;: …}</code>.">Chaque corps d'erreur a la forme <code>{"code": …, "message": …}</code>.</p>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- DOCKER                                         -->
+                    <!-- ============================================== -->
+                    <section id="docker" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">09</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2">Docker</h2>
+                        <p data-en="The repository ships a <code>Dockerfile</code> and a <code>docker-compose.yml</code>. Put your map in <code>data/map.osm</code> (or change <code>OSRM_FILE</code>) and start the service: the API listens on port 5000 and the container healthcheck calls <code>/health</code>."
+                            data-fr="Le dépôt fournit un <code>Dockerfile</code> et un <code>docker-compose.yml</code>. Placez votre carte dans <code>data/map.osm</code> (ou changez <code>OSRM_FILE</code>) et démarrez le service : l'API écoute sur le port 5000 et le healthcheck du conteneur appelle <code>/health</code>.">
+                            Le dépôt fournit un <code>Dockerfile</code> et un <code>docker-compose.yml</code>. Placez votre carte dans <code>data/map.osm</code> (ou changez <code>OSRM_FILE</code>) et démarrez le service : l'API écoute sur le port 5000 et le healthcheck du conteneur appelle <code>/health</code>.</p>
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block">docker compose up -d
+
+<span class="cm"># Mode dev : sources montées, debug Flask, port 5001</span>
+docker compose --profile dev up py-osrm-backend-dev</pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- TESTS                                          -->
+                    <!-- ============================================== -->
+                    <section id="tests" class="scroll-mt-24 mb-16 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">10</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2">Tests</h2>
+                        <p data-en="The suite covers the graph structures, the XML extractor, both engines and the multi-waypoint API. It runs with either <code>unittest</code> or <code>pytest</code>."
+                            data-fr="La suite couvre les structures de graphe, l'extracteur XML, les deux moteurs et l'API multi-points. Elle tourne avec <code>unittest</code> comme avec <code>pytest</code>.">
+                            La suite couvre les structures de graphe, l'extracteur XML, les deux moteurs et l'API multi-points. Elle tourne avec <code>unittest</code> comme avec <code>pytest</code>.</p>
+                        <div class="bg-surface-container-lowest border-l-4 border-secondary p-6 shadow-sm">
+                            <div class="bg-surface-container p-4 overflow-x-auto">
+<pre class="code-block">python -m unittest discover -s tests -v
+<span class="cm"># ou</span>
+pytest</pre>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- LIMITATIONS                                    -->
+                    <!-- ============================================== -->
+                    <section id="limitations" class="scroll-mt-24 mb-8 space-y-6">
+                        <div class="font-label-caps text-[12px] text-primary">11</div>
+                        <h2 class="font-headline-md text-[24px] text-on-background uppercase border-b border-outline-variant pb-2" data-en="Limitations" data-fr="Limites">Limites</h2>
+                        <p data-en="py-osrm-backend favours readability over raw speed. Good to know before loading a whole country:"
+                            data-fr="py-osrm-backend privilégie la lisibilité à la vitesse brute. Bon à savoir avant de charger un pays entier :">
+                            py-osrm-backend privilégie la lisibilité à la vitesse brute. Bon à savoir avant de charger un pays entier :</p>
+                        <ul class="space-y-3 text-[15px] text-on-surface-variant list-none">
+                            <li class="flex items-start gap-2"><span class="material-symbols-outlined text-[16px] text-primary mt-1">chevron_right</span>
+                                <span data-en="The whole graph lives in memory as Python objects." data-fr="Le graphe entier vit en mémoire sous forme d'objets Python.">Le graphe entier vit en mémoire sous forme d'objets Python.</span></li>
+                            <li class="flex items-start gap-2"><span class="material-symbols-outlined text-[16px] text-primary mt-1">chevron_right</span>
+                                <span data-en="No vehicle profile: every <code>highway</code> is usable, weights are distances, and only <code>oneway=yes</code> is understood." data-fr="Pas de profil de véhicule : toute voie <code>highway</code> est utilisable, les poids sont des distances et seul <code>oneway=yes</code> est compris.">Pas de profil de véhicule : toute voie <code>highway</code> est utilisable, les poids sont des distances et seul <code>oneway=yes</code> est compris.</span></li>
+                            <li class="flex items-start gap-2"><span class="material-symbols-outlined text-[16px] text-primary mt-1">chevron_right</span>
+                                <span data-en="The server snaps coordinates with a linear scan over all nodes, and always routes with Dijkstra." data-fr="Le serveur accroche les coordonnées par un parcours linéaire de tous les nœuds, et route toujours avec Dijkstra.">Le serveur accroche les coordonnées par un parcours linéaire de tous les nœuds, et route toujours avec Dijkstra.</span></li>
+                            <li class="flex items-start gap-2"><span class="material-symbols-outlined text-[16px] text-primary mt-1">chevron_right</span>
+                                <span data-en="CH preprocessing runs in pure Python with a simple node ordering: it stays slow on large extracts, best suited to learning and regional maps." data-fr="Le pré-traitement CH tourne en Python pur avec un ordre de contraction simple : il reste lent sur de gros extraits, idéal pour apprendre et pour des cartes régionales.">Le pré-traitement CH tourne en Python pur avec un ordre de contraction simple : il reste lent sur de gros extraits, idéal pour apprendre et pour des cartes régionales.</span></li>
+                        </ul>
+                    </section>
+                </article>
+            </div>
+
+            <footer class="w-full p-4 text-center mt-auto bg-surface border-t border-outline-variant">
+                <p class="font-body-sm text-on-surface-variant">
+                    © 2026 GalTechDev
+                </p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
